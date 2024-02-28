@@ -80,13 +80,13 @@ def Galleani_clock(tp : float,
     Returns
     -------
     t_stochastic: np.ndarray
-        The stochastic timegrid of the signal.
+        The stochastic timegrid of the signal with shape (N+1,).
     t_original: np.ndarray
-        The original equidistant timegrid of the signal.
+        The original equidistant timegrid of the signal with shape (N+1,).
     '''
     
     dt = tp / N #Timestep
-    timegrid = np.linspace(0, tp, N)
+    timegrid = np.arange(0, tp+dt, dt) #N+1 elements
 
     #Calculation matrices
     #eqn. 11, pg 261
@@ -101,9 +101,9 @@ def Galleani_clock(tp : float,
                         [(s2**2) * (dt**2)*0.5, (s2**2) * dt]])
 
     #eqn. 16
-    X = np.zeros((2, N))
+    X = np.zeros((2, len(timegrid)))
     X[:,0] = X0.reshape([2])
-    for i in range(0, N-1):
+    for i in range(0, N):
         J = np.random.multivariate_normal(mean, cov) #eqn. 17
         X[:,i+1] = np.dot(Phi, X[:,i]) + BM + J 
 
