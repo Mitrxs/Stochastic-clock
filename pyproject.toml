@@ -1,0 +1,41 @@
+[project]
+name = "stochasticclock"
+version = "0.0.1"
+description = "Atomic clock simulation"
+readme = "README.md"
+license = { text = "MIT" }
+
+keywords = [
+    "stochastic", "atomic", "SDE", "clock", "timer", "Metrology", "Caesium"
+]
+
+authors = [
+  { name="Ali Sherzad", email="ali.sherzad@spc.ox.ac.uk"}. { name="Pranav Singh", email="ps2106@bath.ac.uk" }
+  ]
+
+maintainers = [
+  { name="Ali Sherzad", email="ali.sherzad@spc.ox.ac.uk"}
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Physics"
+]
+
+requires-python = ">=3.7"
+dependencies = [
+    "numpy>=1.16.5"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Mitrxs/Stochastic-clock"
+"Bug Tracker" = "https://github.com/Mitrxs/Stochastic-clock"
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# To install locally, go to the stochasticclock directory in terminal and run "pip install -e ."
