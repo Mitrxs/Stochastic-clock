@@ -40,7 +40,7 @@ def stochastic_clock(tp,
 
             - Galleani_exact: Use the exact solution to iteratively calculate the 
             deviations of the stochastic timegrid
-            - Galleani_multivariate: Calculate the deviations from their Gaussian 
+            - Galleani_distribution: Calculate the deviations from their Gaussian 
             distribution at each timepoint.
 
     Returns
@@ -56,8 +56,8 @@ def stochastic_clock(tp,
         timegrid = {'stochastic': t_stochastic, 'original': t_original, 
                     'deviation': deviation}
         
-    elif method == 'Galleani_multivariate':
-        t_stochastic, t_original = Galleani_multivariate(tp=tp, N=N, X0=X0, 
+    elif method == 'Galleani_distribution':
+        t_stochastic, t_original = Galleani_multiGauss(tp=tp, N=N, X0=X0, 
                                                          mu=mu, sigma=sigma)
         deviation = t_original - t_stochastic 
         timegrid = {'stochastic': t_stochastic, 'original': t_original, 
@@ -123,7 +123,7 @@ def Galleani_exact(tp, N, X0, mu, sigma):
     return t_stochastic, t_original
 
 
-def Galleani_multivariate(tp, N, X0, mu, sigma):
+def Galleani_multiGauss(tp, N, X0, mu, sigma):
     '''
     Calculation of the stochastic deviation of timegrids using the Gaussian distribution
     of the deviations.
