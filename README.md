@@ -1,6 +1,6 @@
 # stochasticclock
 
-!(https://github.com/Mitrxs/Stochastic-clock/blob/main/example_figures/Example_illustration.png)
+![](example_figures/Example_illustration.png)
 
 A module calculating the stochastic deviations in timepoints for atomic clocks. 
 
