@@ -10,7 +10,8 @@ keywords = [
 ]
 
 authors = [
-  { name="Ali Sherzad", email="ali.sherzad@spc.ox.ac.uk"}. { name="Pranav Singh", email="ps2106@bath.ac.uk" }
+  { name="Ali Sherzad", email="ali.sherzad@spc.ox.ac.uk"}. 
+  { name="Pranav Singh", email="ps2106@bath.ac.uk" }
   ]
 
 maintainers = [
@@ -24,9 +25,9 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics"
 ]
 
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
-    "numpy>=1.16.5"
+    "numpy>=1.21.0"
 ]
 
 [project.urls]

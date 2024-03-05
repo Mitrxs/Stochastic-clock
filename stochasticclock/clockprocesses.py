@@ -3,10 +3,6 @@
 #doi 10.1088/0026-1394/40/3/305
 
 import numpy as np
-from typing import Union
-
-
-#TODO Potentially OOP, a clock class
 
 
 def stochastic_clock(tp, 
@@ -31,7 +27,8 @@ def stochastic_clock(tp,
         deviation to be zero.
     mu : np.ndarray, default np.array([1, 0])
         Deterministic drift terms for the Wiener processes. Default array is set so that
-        the output gives the stochastic timegrid and not only the deviations. 
+        the output gives the stochastic timegrid and not only the deviations. For 
+        `method="distribution"` this array must be a zero-array.
     sigma : np.ndarray, default np.array([0, 0])
         Diffusion coefficients of the noise components which give the intensity of each
         noise. Deafult zero for a perfect clock.
@@ -40,14 +37,16 @@ def stochastic_clock(tp,
 
             - Galleani_exact: Use the exact solution to iteratively calculate the 
             deviations of the stochastic timegrid
-            - Galleani_distribution: Calculate the deviations from their Gaussian 
-            distribution at each timepoint.
+            - distribution: Calculate the distribution of deviations from their Gaussian 
+            at each timepoint (not to be used for simulations).
 
     Returns
     -------
     timegrid: dict
         Return a dictionary containing the original and stochastic timegrids, and the 
         deviation from the original timegrid.
+
+    #TODO Potentially OOP, a clock class
     '''
     if method == 'Galleani_clock':
         t_stochastic, t_original = Galleani_exact(tp=tp, N=N, X0=X0, 
@@ -56,10 +55,10 @@ def stochastic_clock(tp,
         timegrid = {'stochastic': t_stochastic, 'original': t_original, 
                     'deviation': deviation}
         
-    elif method == 'Galleani_distribution':
-        t_stochastic, t_original = Galleani_multiGauss(tp=tp, N=N, X0=X0, 
+    elif method == 'distribution':
+        deviation, t_original = deviation_distribution(tp=tp, N=N, X0=X0, 
                                                          mu=mu, sigma=sigma)
-        deviation = t_original - t_stochastic 
+        t_stochastic = deviation + t_original
         timegrid = {'stochastic': t_stochastic, 'original': t_original, 
                     'deviation': deviation}
     return timegrid
@@ -123,10 +122,10 @@ def Galleani_exact(tp, N, X0, mu, sigma):
     return t_stochastic, t_original
 
 
-def Galleani_multiGauss(tp, N, X0, mu, sigma):
+def deviation_distribution(tp, N, X0, mu, sigma):
     '''
-    Calculation of the stochastic deviation of timegrids using the Gaussian distribution
-    of the deviations.
+    Calculation of the stochastic distribution of deviations from the timegrid at each 
+    timepoint.
 
     Parameters
     ----------
@@ -145,8 +144,8 @@ def Galleani_multiGauss(tp, N, X0, mu, sigma):
     
     Returns
     -------
-    t_stochastic: np.ndarray
-        The stochastic timegrid of the signal with shape (N+1,).
+    deviation: np.ndarray
+        The stochastic deviation at each timepoint. An array of shape (N+1,).
     t_original: np.ndarray
         The original equidistant timegrid of the signal with shape (N+1,).
     '''
@@ -167,8 +166,8 @@ def Galleani_multiGauss(tp, N, X0, mu, sigma):
     
     deviation = X[0]
     t_original = timegrid
-    t_stochastic = timegrid + deviation
-    return t_stochastic, t_original
+    #t_stochastic = timegrid + deviation
+    return deviation, t_original
 
 
 
@@ -178,7 +177,27 @@ def clock_error(timegrid,
     '''
     This is not a statistical measure, rather for viewing the deviations between the
     two timegrids. The timegrid across which the signals are compared is the truncated
-    union of the stochastic and non-stochastic timesteps.
+    union of the stochastic and non-stochastic timepoints.
+
+    Parameters
+    ----------
+    timegrid : np.ndarray
+        The original equidistant timegrid of the signal with shape (N+1,).
+    timegrid_stochastic: np.ndarray
+        The stochastic timegrid of the signal with shape (N+1,).
+    amplitudes: np.ndarray
+        The amplitudes of the signal.
+        
+    Returns
+    -------
+    signal : np.ndarray
+        Two-dimensional array of the union timegrid between the original and stochastic
+        timegrids (first row), and the indexed signal amplitudes for the original 
+        timegrid (second row).
+    signal_stochastic: np.ndarray
+        Two-dimensional array of the union timegrid between the original and stochastic
+        timegrids (first row), and the indexed signal amplitudes for the stochastic 
+        timegrid (second row).
     '''
 
     #Create a new union timegrid that does not exceed the shortest time
