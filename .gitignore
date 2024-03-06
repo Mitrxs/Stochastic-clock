@@ -1,5 +1,6 @@
-/testing.ipynb
-/testing.py
-/.env
-/.vscode/*
-/env/*
+testing.ipynb
+testing.py
+.env
+.vscode/*
+env/*
+dist/*
