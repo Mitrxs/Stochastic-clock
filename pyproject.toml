@@ -1,8 +1,8 @@
 [project]
 name = "stochasticclock"
-version = "0.0.1"
+version = "0.0.2"
 description = "Atomic clock simulation"
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 license = { text = "MIT" }
 
 keywords = [
