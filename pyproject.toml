@@ -1,6 +1,6 @@
 [project]
 name = "stochasticclock"
-version = "0.0.2"
+version = "0.0.3"
 description = "Atomic clock simulation"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = { text = "MIT" }
@@ -32,7 +32,8 @@ dependencies = [
 
 [project.urls]
 "Homepage" = "https://github.com/Mitrxs/Stochastic-clock"
-"Bug Tracker" = "https://github.com/Mitrxs/Stochastic-clock"
+"Bug Tracker" = "https://github.com/Mitrxs/Stochastic-clock/issues"
+"Changelog" = "https://github.com/Mitrxs/Stochastic-clock/blob/main/CHANGELOG.md"
 
 
 [build-system]

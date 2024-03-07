@@ -5,6 +5,8 @@
 - Timegrid keyword for the perfect clock timegrid changed from `'original'` to `'perfect'` for the output of `stochastic_clock()`
 - Example walkthrough Jupyter notebook 
 - README tweaked
+- Changelog added
+- Bug tracker URL now correct
 
 ## 0.0.2 (6/03/24)
 Changed the README to include figure and equation.
