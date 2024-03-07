@@ -48,19 +48,32 @@ def stochastic_clock(tp,
 
     #TODO Potentially OOP, a clock class
     '''
-    if method == 'Galleani_clock':
+    timegrid = {}
+    if method == 'Galleani_exact':
         t_stochastic, t_original = Galleani_exact(tp=tp, N=N, X0=X0, 
-                                                  mu=mu, sigma=sigma)
-        deviation = t_original - t_stochastic 
-        timegrid = {'stochastic': t_stochastic, 'original': t_original, 
-                    'deviation': deviation}
-        
+                                                  mu=mu, sigma=sigma) 
+        timegrid['perfect'] = t_original
+
+        if np.all(mu == np.array([1, 0])):
+            deviation = t_original - t_stochastic
+            timegrid['stochastic'] = t_stochastic
+            timegrid['deviation'] = deviation 
+        else:
+            timegrid['deviation'] = t_stochastic
+
     elif method == 'distribution':
         deviation, t_original = deviation_distribution(tp=tp, N=N, X0=X0, 
                                                          mu=mu, sigma=sigma)
-        t_stochastic = deviation + t_original
-        timegrid = {'stochastic': t_stochastic, 'original': t_original, 
-                    'deviation': deviation}
+        timegrid['perfect'] = t_original
+
+        if np.all(mu == np.array([1, 0])):
+            t_stochastic = deviation
+            deviation = t_original - t_stochastic
+            timegrid['stochastic'] = t_stochastic
+            timegrid['deviation'] = deviation 
+        else:
+            timegrid['deviation'] = deviation
+        
     return timegrid
 
 
