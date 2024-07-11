@@ -3,14 +3,17 @@
 #doi 10.1088/0026-1394/40/3/305
 
 import numpy as np
+from typing import Tuple
 
 
-def stochastic_clock(tp, 
-                     N , 
-                     X0=np.array([0, 0]), 
-                     mu=np.array([1, 0]), 
-                     sigma=np.array([0, 0]),
-                     method='Galleani_exact'):
+def stochastic_clock(
+        tp : float, 
+        N : float, 
+        X0 : np.ndarray = np.array([0, 0]), 
+        mu : np.ndarray =np.array([1, 0]), 
+        sigma : np.ndarray = np.array([0, 0]),
+        method : str = 'Galleani_exact'
+        ) -> dict:
     '''
     Calculation of the stochastic deviation of timegrids. This function is recommended to 
     being called over `Galleani_clock()`.
@@ -42,7 +45,7 @@ def stochastic_clock(tp,
 
     Returns
     -------
-    timegrid: dict
+    timegrid : dict
         Return a dictionary containing the original and stochastic timegrids, and the 
         deviation from the original timegrid.
 
@@ -50,8 +53,13 @@ def stochastic_clock(tp,
     '''
     timegrid = {}
     if method == 'Galleani_exact':
-        t_stochastic, t_original = Galleani_exact(tp=tp, N=N, X0=X0, 
-                                                  mu=mu, sigma=sigma) 
+        t_stochastic, t_original = Galleani_exact(
+                                   tp=tp, 
+                                   N=N, 
+                                   X0=X0, 
+                                   mu=mu, 
+                                   sigma=sigma
+                                   ) 
         timegrid['perfect'] = t_original
 
         if np.all(mu == np.array([1, 0])):
@@ -62,8 +70,13 @@ def stochastic_clock(tp,
             timegrid['deviation'] = t_stochastic
 
     elif method == 'distribution':
-        deviation, t_original = deviation_distribution(tp=tp, N=N, X0=X0, 
-                                                         mu=mu, sigma=sigma)
+        deviation, t_original = deviation_distribution(
+                                tp=tp, 
+                                N=N, 
+                                X0=X0, 
+                                mu=mu, 
+                                sigma=sigma
+                                )
         timegrid['perfect'] = t_original
 
         if np.all(mu == np.array([1, 0])):
@@ -73,11 +86,19 @@ def stochastic_clock(tp,
             timegrid['deviation'] = deviation 
         else:
             timegrid['deviation'] = deviation
+    else:
+        raise ValueError('method must be either `Galleani_exact` or `distribution`')
         
     return timegrid
 
 
-def Galleani_exact(tp, N, X0, mu, sigma):
+def Galleani_exact(
+        tp : float, 
+        N : float, 
+        X0 : np.ndarray, 
+        mu : np.ndarray, 
+        sigma : np.ndarray
+        ) -> Tuple[np.ndarray, np.ndarray]:
     '''
     Calculation of the stochastic deviation of timegrids.
 
@@ -104,29 +125,29 @@ def Galleani_exact(tp, N, X0, mu, sigma):
         The original equidistant timegrid of the signal with shape (N+1,).
     '''
     
-    dt = tp / N #Timestep
-    timegrid = np.arange(0, tp+dt, dt) #N+1 elements
+    dt = tp / N # Timestep
+    timegrid = np.arange(0, tp+dt, dt) # N+1 elements
 
-    #Calculation matrices
-    #eqn. 11, pg 261
+    # Calculation matrices
+    # eqn. 11, pg 261
     Phi = np.array([[1, dt], [0, 1]])
     B = np.array([[dt, (dt**2) / 2], [0, dt]])
-    #BM = np.dot(B, mu)
+    # BM = np.dot(B, mu)
     m1, m2 = mu
     BM = np.array([(dt * m1) + ( 0.5 * (dt**2) * m2),
                    dt * m2])
 
-    #Mean, covariance for multivariate normal distribution (eqn 17)
+    # Mean, covariance for multivariate normal distribution (eqn 17)
     mean = np.zeros(2)
     s1, s2 = sigma
     cov = np.array([[(s1**2)*dt + ((s2**2) * (dt**3))/3, (s2**2) * (dt**2)*0.5], 
                         [(s2**2) * (dt**2)*0.5, (s2**2) * dt]])
 
-    #eqn. 16
+    # eqn. 16
     X = np.zeros((2, len(timegrid)))
     X[:,0] = X0.reshape([2])
     for i in range(0, N):
-        J = np.random.multivariate_normal(mean, cov) #eqn. 17
+        J = np.random.multivariate_normal(mean, cov) # eqn. 17
         X[:,i+1] = np.dot(Phi, X[:,i]) + BM + J 
 
     t_stochastic = X[0]
@@ -135,7 +156,13 @@ def Galleani_exact(tp, N, X0, mu, sigma):
     return t_stochastic, t_original
 
 
-def deviation_distribution(tp, N, X0, mu, sigma):
+def deviation_distribution(
+        tp : float, 
+        N : float, 
+        X0 : np.ndarray, 
+        mu : np.ndarray, 
+        sigma : np.ndarray
+        ) -> Tuple[np.ndarray, np.ndarray]:
     '''
     Calculation of the stochastic distribution of deviations from the timegrid at each 
     timepoint.
@@ -162,12 +189,12 @@ def deviation_distribution(tp, N, X0, mu, sigma):
     t_original: np.ndarray
         The original equidistant timegrid of the signal with shape (N+1,).
     '''
-    #Assign variables
+    # Assign variables
     c1, c2 = X0
     m1, m2 = mu
     s1, s2 = sigma
-    dt = tp / N #Timestep
-    timegrid = np.arange(0, tp+dt, dt) #N+1 elements
+    dt = tp / N # Timestep
+    timegrid = np.arange(0, tp+dt, dt) # N+1 elements
     X = np.zeros((2,len(timegrid)))
 
     mean = lambda t : np.array([c1 + ((c2 + m1) *t) + (m2 * (t**2) * 0.5),
@@ -179,14 +206,16 @@ def deviation_distribution(tp, N, X0, mu, sigma):
     
     deviation = X[0]
     t_original = timegrid
-    #t_stochastic = timegrid + deviation
+    # t_stochastic = timegrid + deviation
     return deviation, t_original
 
 
 
-def clock_error(timegrid, 
-                timegrid_stochastic, 
-                amplitudes):
+def clock_error(
+        timegrid : np.ndarray, 
+        timegrid_stochastic : np.ndarray, 
+        amplitudes : np.ndarray
+        ) -> Tuple[np.ndarray, np.ndarray]:
     '''
     This is not a statistical measure, rather for viewing the deviations between the
     two timegrids. The timegrid across which the signals are compared is the truncated
@@ -207,21 +236,21 @@ def clock_error(timegrid,
         Two-dimensional array of the union timegrid between the original and stochastic
         timegrids (first row), and the indexed signal amplitudes for the original 
         timegrid (second row).
-    signal_stochastic: np.ndarray
+    signal_stochastic : np.ndarray
         Two-dimensional array of the union timegrid between the original and stochastic
         timegrids (first row), and the indexed signal amplitudes for the stochastic 
         timegrid (second row).
     '''
 
-    #Create a new union timegrid that does not exceed the shortest time
+    # Create a new union timegrid that does not exceed the shortest time
     stop_time = np.min([np.max(timegrid), np.max(timegrid_stochastic)])
     time_union = np.union1d(timegrid, timegrid_stochastic)
     time_union = time_union[time_union <= stop_time]
 
-    #Timepoints on deterministic timegrid in time_union = True
+    # Timepoints on deterministic timegrid in time_union = True
     time_deterministic_bool = np.in1d(time_union, timegrid)
 
-    #Index time_union points on the relevant timegrid
+    # Index time_union points on the relevant timegrid
     time_index = np.zeros(time_deterministic_bool.shape, dtype=np.int64)
     for i, elem in enumerate(time_union):
         if time_deterministic_bool[i]:
@@ -229,21 +258,21 @@ def clock_error(timegrid,
         else:
             time_index[i] = np.argwhere(timegrid_stochastic == elem)[0][0]
 
-    #Interpolate the amplitudes of the deterministic and stochastic signals onto the 
-    #union timegrid
+    # Interpolate the amplitudes of the deterministic and stochastic signals onto the 
+    # union timegrid
     amp_deterministic = np.zeros(time_union.shape)
     amp_stochastic = np.zeros(time_union.shape)
     for i, (index, deterministic) in enumerate(zip(time_index, time_deterministic_bool)):
         if deterministic and i != 0:
-            #If the timepoint is on the deterministic timegrid, return its corresponding
-            #amplitude
-            #If the timepoint is on the stochastic timegrid, return the previous amplitude
+            # If the timepoint is on the deterministic timegrid, return its corresponding
+            # amplitude. If the timepoint is on the stochastic timegrid, return the 
+            # previous amplitude
             amp_deterministic[i] = amplitudes[index]
             amp_stochastic[i] = amp_stochastic[i-1]
         elif not deterministic and i != 0:
-            #If the timepoint is on the stochastic timegrid, return its corresponding
-            #amplitude
-            #If the timepoint is on the stochastic timegrid, return the previous amplitude
+            # If the timepoint is on the stochastic timegrid, return its corresponding
+            # amplitude. If the timepoint is on the stochastic timegrid, return the 
+            # previous amplitude
             amp_deterministic[i] = amp_deterministic[i-1]
             amp_stochastic[i] = amplitudes[index]
 
